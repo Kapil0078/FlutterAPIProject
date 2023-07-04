@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
+import 'package:flutter_api_project/screens/Home/create_update_user.dart';
 import 'package:flutter_api_project/screens/Home/home_page.dart';
 
 import 'color_constatnt.dart';
@@ -31,6 +32,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+      initialRoute: HomePage.pageName,
+      routes: <String, Widget Function(BuildContext)>{
+        HomePage.pageName: (context) => const HomePage(),
+        CreateUpdateUser.pageName: (context) => const CreateUpdateUser(),
+      },
       home: const HomePage(),
     );
   }

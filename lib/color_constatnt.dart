@@ -16,4 +16,5 @@ final Map<int, Color> swatch = {
 };
 
 const background = Color.fromRGBO(118, 59, 96, 0.03);
+const grey = Color(0xff818181);
 const black = Color(0xff313131);

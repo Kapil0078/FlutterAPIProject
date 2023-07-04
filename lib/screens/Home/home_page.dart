@@ -1,18 +1,51 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_api_project/color_constatnt.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
+import 'package:flutter_api_project/screens/Home/create_update_user.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../widgets/custom_icon.dart';
 
 class HomePage extends StatelessWidget {
+  static const String pageName = "/home";
   const HomePage({super.key});
 
+  final btnList = const [
+    {
+      'title': "Update",
+      'path': "assets/icons/edit2.svg",
+    },
+    {
+      'title': "Delete",
+      'path': "assets/icons/delete.svg",
+    }
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Users"),
+      ),
+      floatingActionButton: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushNamed(context, CreateUpdateUser.pageName);
+        },
+        icon: const Icon(
+          CupertinoIcons.add,
+          color: Colors.white,
+          size: 15,
+        ),
+        label: Text(
+          "Add User",
+          style: MyTextStyle.medium.copyWith(
+            color: Colors.white,
+            fontSize: 12.5,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: appPrimary,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -21,6 +54,7 @@ class HomePage extends StatelessWidget {
         ),
         child: ListView.builder(
           itemCount: 5,
+          padding: const EdgeInsets.only(bottom: 30),
           itemBuilder: (context, index) {
             return Stack(
               children: [
@@ -109,23 +143,22 @@ class HomePage extends StatelessWidget {
                     offset: const Offset(-15, 45),
                     elevation: 1.5,
                     itemBuilder: (context) {
-                      return [
-                        const PopupMenuItem(
-                          child: CustomBtn(
-                            svgPath: "assets/icons/edit2.svg",
-                            text: "Update",
-                          ),
-                        ),
-                        const PopupMenuItem(
-                          child: CustomBtn(
-                            svgPath: "assets/icons/delete.svg",
-                            text: "Delete",
-                            svgHeight: 22,
-                            svgWidth: 22,
-                            color: Colors.redAccent,
-                          ),
-                        ),
-                      ];
+                      return btnList.map(
+                        (e) {
+                          final index = btnList.indexOf(e);
+                          return PopupMenuItem(
+                            value: index,
+                            child: CustomBtn(
+                              svgPath: e['path']!,
+                              text: e['title']!,
+                              color: index == 1 ? Colors.redAccent : black,
+                              svgHeight: index == 1 ? 23 : 20,
+                              svgWidth: index == 1 ? 23 : 20,
+                            ),
+                            onTap: () {},
+                          );
+                        },
+                      ).toList();
                     },
                   ),
                 ),

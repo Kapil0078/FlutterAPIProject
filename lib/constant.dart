@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class StringConstant {
   // ErrorMsg
   static const initialErrorMsg = "Something went wrong";
@@ -6,3 +8,5 @@ class StringConstant {
   static const error409 = "Duplicate record found";
   static const error500 = "Internal server error";
 }
+
+const fieldHeight = SizedBox(height: 12);
