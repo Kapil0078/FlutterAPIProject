@@ -13,6 +13,9 @@ class MyTextFormField extends StatelessWidget {
   final int? maxLines;
   final TextInputType? keyboardType;
   final String? hintText;
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
+  final TextInputAction? textInputAction;
 
   const MyTextFormField({
     Key? key,
@@ -24,6 +27,9 @@ class MyTextFormField extends StatelessWidget {
     this.maxLines = 1,
     this.keyboardType,
     this.hintText,
+    this.focusNode,
+    this.onFieldSubmitted, 
+    this.textInputAction,
   }) : super(key: key);
 
   OutlineInputBorder border({Color color = appPrimary, double width = 1.0}) {
@@ -52,43 +58,50 @@ class MyTextFormField extends StatelessWidget {
               ),
             ),
           ),
-        TextFormField(
-          controller: controller,
-          cursorColor: appPrimary,
-          cursorHeight: 25,
-          validator: validator,
-          maxLength: maxLength,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-          style: MyTextStyle.regular.copyWith(
-            fontSize: 18,
-            color: appPrimary,
+        Theme(
+          data: ThemeData(
+            useMaterial3: false,
           ),
-          inputFormatters: inputFormatters,
-          decoration: InputDecoration(
-            counterText: "",
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 12,
-            ),
-            hintText: hintText,
-            hintMaxLines: 1,
-            hintStyle: MyTextStyle.regular.copyWith(
-              color: grey,
-              fontSize: 15,
-            ),
-            border: border(
-              width: 0.75,
-            ),
-            focusedBorder: border(
+          child: TextFormField(
+            focusNode: focusNode,
+            controller: controller,
+            cursorColor: appPrimary,
+            validator: validator,
+            maxLength: maxLength,
+            maxLines: maxLines,
+            keyboardType: keyboardType,
+            onFieldSubmitted: onFieldSubmitted,
+            style: MyTextStyle.regular.copyWith(
+              fontSize: 18,
               color: appPrimary,
-              width: 1.2,
             ),
-            disabledBorder: border(
-              width: 0.75,
-            ),
-            enabledBorder: border(
-              width: 0.75,
+            inputFormatters: inputFormatters,
+            textInputAction: textInputAction,
+            decoration: InputDecoration(
+              counterText: "",
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+              hintText: hintText,
+              hintMaxLines: 1,
+              hintStyle: MyTextStyle.regular.copyWith(
+                color: grey,
+                fontSize: 15,
+              ),
+              border: border(
+                width: 0.75,
+              ),
+              focusedBorder: border(
+                color: appPrimary,
+                width: 1.2,
+              ),
+              disabledBorder: border(
+                width: 0.75,
+              ),
+              enabledBorder: border(
+                width: 0.75,
+              ),
             ),
           ),
         ),
