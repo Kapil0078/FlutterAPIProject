@@ -5,6 +5,7 @@ import 'package:flutter_api_project/helper_function/email_validator.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
 import 'package:flutter_api_project/helper_function/validators.dart';
 import 'package:flutter_api_project/widgets/my_text_form_field.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../constant.dart';
 import '../../widgets/leading_btn.dart';
 
@@ -55,10 +56,20 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
   // nextFocus
   void nextFocus(FocusNode node) => node.requestFocus();
 
-  void onSave() {
-    print('pressed');
-    if (_key.currentState != null && _key.currentState!.validate()) {
-      // TODO : API
+  void onSave() async {
+    bool validImage = true;
+    if (urlController.text.trim().isNotEmpty) {
+      final image = await isImage(uri: urlController.text.trim());
+      validImage = image;
+      if (image == false) {
+        Fluttertoast.showToast(msg: "Invalid Image link");
+      }
+    }
+
+    if (_key.currentState != null &&
+        _key.currentState!.validate() &&
+        validImage) {
+      print('passed');
     }
   }
 
@@ -161,7 +172,6 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
                   },
                   label: "Image Url",
                   hintText: "Enter image url",
-                  validator: urlValidation,
                 ),
                 fieldHeight,
                 MyTextFormField(

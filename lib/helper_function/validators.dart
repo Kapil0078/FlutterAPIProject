@@ -1,5 +1,7 @@
 // String? Function(String?)?
 
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_api_project/helper_function/email_validator.dart';
 
 String? emailValidator(String? email) {
@@ -52,13 +54,33 @@ String? ageValidation(String? age) {
   }
 }
 
-String? urlValidation(String? url) {
-  // Pattern pattern = r"(https?:\/\/.*\.(?:png|jpg))";
-  Pattern pattern = r"/([a-z\-_0-9\/\:\.]*\.(jpg|jpeg|png|gif))/i";
-  if (url != null && url.trim().isNotEmpty) {
-    RegExp regExp = RegExp(pattern.toString());
-    if (regExp.hasMatch(url)) return null;
-    return "invalid image url";
+
+
+
+Future<bool> isImage({required String uri}) async {
+  final type = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+  ];
+  final dio = Dio();
+  try {
+    final Response response = await dio.head(uri);
+    debugPrint("statusCode : ${response.statusCode}");
+    debugPrint("Type : ${response.headers["content-type"]?[0]}");
+    if (response.statusCode == 200) {
+      final image = response.headers["content-type"]![0];
+
+      final res = type.any((e) => e == image.toLowerCase());
+      return res;
+    } else {
+      return false;
+    }
+  } on DioException catch (e) {
+    debugPrint("DioCatch : $e");
+    return false;
+  } catch (e) {
+    debugPrint("Catch : $e");
+    return false;
   }
-  return null;
 }
