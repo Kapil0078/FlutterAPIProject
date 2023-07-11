@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 class StringConstant {
+  // API
+  static const String apiUrl = "https://sahil-flutter.vercel.app/api/v1/";
+  // User
+  static const readUser = "users";
+  static const createUser = "users";
+
   // ErrorMsg
   static const initialErrorMsg = "Something went wrong";
   static const error400 = "Bad request";

@@ -54,14 +54,12 @@ String? ageValidation(String? age) {
   }
 }
 
-
-
-
 Future<bool> isImage({required String uri}) async {
   final type = [
     "image/jpeg",
     "image/jpg",
     "image/png",
+    "binary/octet-stream",
   ];
   final dio = Dio();
   try {

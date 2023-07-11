@@ -1,11 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_api_project/color_constatnt.dart';
-import 'package:flutter_api_project/helper_function/email_validator.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
 import 'package:flutter_api_project/helper_function/validators.dart';
+import 'package:flutter_api_project/providers/user_provider.dart';
 import 'package:flutter_api_project/widgets/my_text_form_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import '../../constant.dart';
 import '../../widgets/leading_btn.dart';
 
@@ -56,7 +59,7 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
   // nextFocus
   void nextFocus(FocusNode node) => node.requestFocus();
 
-  void onSave() async {
+  void onSave(BuildContext context) async {
     bool validImage = true;
     if (urlController.text.trim().isNotEmpty) {
       final image = await isImage(uri: urlController.text.trim());
@@ -69,12 +72,33 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
     if (_key.currentState != null &&
         _key.currentState!.validate() &&
         validImage) {
-      print('passed');
+      final json = {
+        "name": nameController.text.trim(),
+        "mobile_number": phoneController.text.trim(),
+        "email": emailController.text.trim(),
+        if (urlController.text.trim().isNotEmpty)
+          "image": urlController.text.trim(),
+        if (ageController.text.trim().isNotEmpty)
+          "age": int.parse(ageController.text.trim()),
+        if (addressController.text.trim().isNotEmpty)
+          "address": addressController.text.trim(),
+      };
+
+      // createUser
+      context.read<UserProvider>().createUser(json: json).then(
+        (value) async {
+          if (value.success) {
+            await context.read<UserProvider>().readUser();
+            Navigator.pop(context);
+          }
+        },
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add New User"),
@@ -86,13 +110,24 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
         style: ElevatedButton.styleFrom(
           backgroundColor: appPrimary,
         ),
-        onPressed: onSave,
-        child: Text(
-          "Save",
-          style: MyTextStyle.medium.copyWith(
-            color: Colors.white,
-            fontSize: 15,
-          ),
+        onPressed: () => onSave(context),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: provider.isLoadingForCreateUser
+              ? const SizedBox(
+                  width: 15,
+                  height: 15,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  "Save",
+                  style: MyTextStyle.medium.copyWith(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
         ),
       ),
       body: Padding(
@@ -114,12 +149,6 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
                   validator: (name) {
                     if (name != null && name.trim().isNotEmpty) return null;
                     return "Please enter name";
-
-                    // if (name == null || name.trim().isEmpty) {
-                    //   return "Please enter name";
-                    // } else {
-                    //   return null;
-                    // }
                   },
                 ),
                 fieldHeight,
@@ -155,10 +184,6 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
                   maxLength: 3,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
-                    // FilteringTextInputFormatter.allow(
-                    //   RegExp(r"^\d{0,10}(\.\d{0,2})?"),
-                    // ),
-
                     FilteringTextInputFormatter.allow(RegExp('[0-9]'))
                   ],
                   validator: ageValidation,
@@ -177,7 +202,7 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
                 MyTextFormField(
                   controller: addressController,
                   focusNode: addressFocus,
-                  onFieldSubmitted: (_) => onSave(),
+                  onFieldSubmitted: (_) => onSave(context),
                   textInputAction: TextInputAction.done,
                   label: "Address",
                   hintText: "Enter address",

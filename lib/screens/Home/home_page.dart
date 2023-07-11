@@ -2,15 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_api_project/color_constatnt.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
+import 'package:flutter_api_project/models/user_model.dart';
+import 'package:flutter_api_project/providers/user_provider.dart';
 import 'package:flutter_api_project/screens/Home/create_update_user.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../widgets/custom_icon.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   static const String pageName = "/home";
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final btnList = const [
     {
       'title': "Update",
@@ -21,8 +29,19 @@ class HomePage extends StatelessWidget {
       'path': "assets/icons/delete.svg",
     }
   ];
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<UserProvider>().readUser();
+    });
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Users"),
@@ -47,126 +66,140 @@ class HomePage extends StatelessWidget {
           backgroundColor: appPrimary,
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 15,
-        ),
-        child: ListView.builder(
-          itemCount: 5,
-          padding: const EdgeInsets.only(bottom: 30),
-          itemBuilder: (context, index) {
-            return Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                    color: background,
-                    border: Border.all(
-                      color: appPrimary,
-                      width: 0.20,
-                    ),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 90,
-                          height: 130,
-                          child: Image.asset(
-                            "assets/images/placeholder.png",
-                            fit: BoxFit.cover,
+      body: userProvider.isLoadingForReadUser
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: appPrimary,
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+              child: ListView.builder(
+                itemCount: userProvider.users.length,
+                padding: const EdgeInsets.only(bottom: 30),
+                itemBuilder: (context, index) {
+                  final UserModel user = userProvider.users.elementAt(index);
+                  return Stack(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        decoration: BoxDecoration(
+                          color: background,
+                          border: Border.all(
+                            color: appPrimary,
+                            width: 0.20,
                           ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        const SizedBox(width: 10),
-                        Flexible(
-                          child: Column(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const CustomIcon(
-                                svgPath: "assets/icons/person.svg",
-                                text: "Sandip",
+                              SizedBox(
+                                width: 90,
+                                height: 130,
+                                child:
+                                    user.image != null && user.image!.isNotEmpty
+                                        ? Image.network(
+                                            user.image!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.asset(
+                                            "assets/images/person.jpg",
+                                            fit: BoxFit.cover,
+                                          ),
                               ),
-                              const SizedBox(height: 5),
-                              CustomIcon(
-                                text: "9988776655",
-                                svg: Image.asset(
-                                  "assets/images/callPng.png",
-                                  width: 21,
-                                  height: 21,
-                                  color: appPrimary,
+                              const SizedBox(width: 10),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomIcon(
+                                      svgPath: "assets/icons/person.svg",
+                                      text: user.name,
+                                    ),
+                                    const SizedBox(height: 5),
+                                    CustomIcon(
+                                      text: user.mobileNumber,
+                                      svg: Image.asset(
+                                        "assets/images/callPng.png",
+                                        width: 21,
+                                        height: 21,
+                                        color: appPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    CustomIcon(
+                                      text: user.email,
+                                      svgPath: "assets/icons/email.svg",
+                                    ),
+                                    const SizedBox(height: 5),
+                                    CustomIcon(
+                                      text: "${user.age ?? "-"}",
+                                      svg: Image.asset(
+                                        "assets/images/age.png",
+                                        width: 21,
+                                        height: 21,
+                                        color: appPrimary,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    CustomIcon(
+                                      text: user.address ?? "-",
+                                      svgPath: "assets/icons/location.svg",
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              const CustomIcon(
-                                text: "example@gmail.com",
-                                svgPath: "assets/icons/email.svg",
-                              ),
-                              const SizedBox(height: 5),
-                              CustomIcon(
-                                text: "20",
-                                svg: Image.asset(
-                                  "assets/images/age.png",
-                                  width: 21,
-                                  height: 21,
-                                  color: appPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              const CustomIcon(
-                                text: "303-Creative institute",
-                                svgPath: "assets/icons/location.svg",
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: PopupMenuButton(
-                    constraints: const BoxConstraints(
-                      maxWidth: 125,
-                      // maxHeight: 120,
-                    ),
-                    padding: EdgeInsets.zero,
-                    tooltip: "Update-Delete",
-                    offset: const Offset(-15, 45),
-                    elevation: 1.5,
-                    itemBuilder: (context) {
-                      return btnList.map(
-                        (e) {
-                          final index = btnList.indexOf(e);
-                          return PopupMenuItem(
-                            value: index,
-                            child: CustomBtn(
-                              svgPath: e['path']!,
-                              text: e['title']!,
-                              color: index == 1 ? Colors.redAccent : black,
-                              svgHeight: index == 1 ? 23 : 20,
-                              svgWidth: index == 1 ? 23 : 20,
-                            ),
-                            onTap: () {},
-                          );
-                        },
-                      ).toList();
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: PopupMenuButton(
+                          constraints: const BoxConstraints(
+                            maxWidth: 125,
+                            // maxHeight: 120,
+                          ),
+                          padding: EdgeInsets.zero,
+                          tooltip: "Update-Delete",
+                          offset: const Offset(-15, 45),
+                          elevation: 1.5,
+                          itemBuilder: (context) {
+                            return btnList.map(
+                              (e) {
+                                final index = btnList.indexOf(e);
+                                return PopupMenuItem(
+                                  value: index,
+                                  child: CustomBtn(
+                                    svgPath: e['path']!,
+                                    text: e['title']!,
+                                    color:
+                                        index == 1 ? Colors.redAccent : black,
+                                    svgHeight: index == 1 ? 23 : 20,
+                                    svgWidth: index == 1 ? 23 : 20,
+                                  ),
+                                  onTap: () {},
+                                );
+                              },
+                            ).toList();
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
     );
   }
 }

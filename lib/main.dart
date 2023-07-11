@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
+import 'package:flutter_api_project/providers/user_provider.dart';
 import 'package:flutter_api_project/screens/Home/create_update_user.dart';
 import 'package:flutter_api_project/screens/Home/home_page.dart';
+import 'package:provider/provider.dart';
 
 import 'color_constatnt.dart';
 
@@ -15,29 +17,36 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'API Project',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: appPrimary),
-        primarySwatch: MaterialColor(primary, swatch),
-        useMaterial3: true,
-        fontFamily: "Inter",
-        appBarTheme: AppBarTheme(
-          elevation: 0.0,
-          backgroundColor: appPrimary,
-          centerTitle: false,
-          titleTextStyle: MyTextStyle.semiBold.copyWith(
-            fontSize: 19,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'API Project',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: appPrimary),
+          primarySwatch: MaterialColor(primary, swatch),
+          useMaterial3: true,
+          fontFamily: "Inter",
+          appBarTheme: AppBarTheme(
+            elevation: 0.0,
+            backgroundColor: appPrimary,
+            centerTitle: false,
+            titleTextStyle: MyTextStyle.semiBold.copyWith(
+              fontSize: 19,
+            ),
           ),
         ),
+        initialRoute: HomePage.pageName,
+        routes: <String, Widget Function(BuildContext)>{
+          HomePage.pageName: (context) => const HomePage(),
+          CreateUpdateUser.pageName: (context) => const CreateUpdateUser(),
+        },
+        home: const HomePage(),
       ),
-      initialRoute: HomePage.pageName,
-      routes: <String, Widget Function(BuildContext)>{
-        HomePage.pageName: (context) => const HomePage(),
-        CreateUpdateUser.pageName: (context) => const CreateUpdateUser(),
-      },
-      home: const HomePage(),
     );
   }
 }
