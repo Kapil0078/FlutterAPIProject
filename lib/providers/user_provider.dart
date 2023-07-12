@@ -54,14 +54,14 @@ class UserProvider extends ChangeNotifier {
       debugPrint("readUser : DioCatchError : $e");
       Fluttertoast.showToast(msg: responseClass.message);
       isLoadingForReadUser = false;
-         users = [];
+      users = [];
       notifyListeners();
       return responseClass;
     } catch (e) {
       debugPrint("readUser : CatchError : $e");
       Fluttertoast.showToast(msg: responseClass.message);
       isLoadingForReadUser = false;
-         users = [];
+      users = [];
       notifyListeners();
       return responseClass;
     }
@@ -81,7 +81,7 @@ class UserProvider extends ChangeNotifier {
 
     try {
       isLoadingForCreateUser = true;
-      await Future.delayed(const Duration(seconds: 5));
+
       notifyListeners();
 
       Response response = await dio.post(
@@ -118,6 +118,54 @@ class UserProvider extends ChangeNotifier {
       debugPrint('createUser catch : $e');
       Fluttertoast.showToast(msg: responseClass.message);
       isLoadingForCreateUser = false;
+      notifyListeners();
+      return responseClass;
+    }
+  }
+
+  // DeleteUser
+  bool isLoadingForDeleteUser = false;
+  Future<ResponseClass> deleteUser({
+    required int userID,
+  }) async {
+    final uri =
+        "${StringConstant.apiUrl}${StringConstant.deleteUser(userID: userID)}";
+    ResponseClass responseClass = ResponseClass(
+      success: false,
+      message: StringConstant.initialErrorMsg,
+    );
+
+    try {
+      isLoadingForDeleteUser = true;
+      notifyListeners();
+      Response response = await dio.delete(uri);
+      debugPrint("deleteUser responseCode : ${response.statusCode}");
+      if (response.statusCode == 200) {
+        responseClass.success = true;
+        isLoadingForDeleteUser = false;
+        responseClass.message = response.data['msg'];
+        notifyListeners();
+        return responseClass;
+      } else {
+        responseClass.success = false;
+        isLoadingForDeleteUser = false;
+        responseClass.message = errorMessage(response.statusCode);
+        Fluttertoast.showToast(msg: responseClass.message);
+        notifyListeners();
+        return responseClass;
+      }
+    } on DioException catch (e) {
+      debugPrint("deleteUser DioCatchError : $e");
+      responseClass.success = false;
+      isLoadingForDeleteUser = false;
+      Fluttertoast.showToast(msg: responseClass.message);
+      notifyListeners();
+      return responseClass;
+    } catch (e) {
+      debugPrint("deleteUser CatchError : $e");
+      responseClass.success = false;
+      isLoadingForDeleteUser = false;
+      Fluttertoast.showToast(msg: responseClass.message);
       notifyListeners();
       return responseClass;
     }

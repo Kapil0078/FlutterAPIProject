@@ -6,6 +6,7 @@ class StringConstant {
   // User
   static const readUser = "users";
   static const createUser = "users";
+  static String deleteUser({required int userID}) => "users/$userID";
 
   // ErrorMsg
   static const initialErrorMsg = "Something went wrong";

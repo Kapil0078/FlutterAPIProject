@@ -5,6 +5,7 @@ import 'package:flutter_api_project/helper_function/my_text_style.dart';
 import 'package:flutter_api_project/models/user_model.dart';
 import 'package:flutter_api_project/providers/user_provider.dart';
 import 'package:flutter_api_project/screens/Home/create_update_user.dart';
+import 'package:flutter_api_project/widgets/delete_user_popup.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
@@ -174,6 +175,13 @@ class _HomePageState extends State<HomePage> {
                           tooltip: "Update-Delete",
                           offset: const Offset(-15, 45),
                           elevation: 1.5,
+                          onSelected: (i) => i == 0
+                              ? null
+                              : showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      UserDeletePopup(userID: user.id),
+                                ),
                           itemBuilder: (context) {
                             return btnList.map(
                               (e) {
@@ -188,7 +196,13 @@ class _HomePageState extends State<HomePage> {
                                     svgHeight: index == 1 ? 23 : 20,
                                     svgWidth: index == 1 ? 23 : 20,
                                   ),
-                                  onTap: () {},
+                                  // onTap: () {
+                                  //   if (index == 0) {
+                                  //   } else {
+                                  //     onDelete(
+                                  //         userID: user.id, context: context);
+                                  //   }
+                                  // },
                                 );
                               },
                             ).toList();
@@ -243,3 +257,18 @@ class CustomBtn extends StatelessWidget {
     );
   }
 }
+
+// Future<void> onDelete(
+//     {required int userID, required BuildContext context}) async {
+//   Future.delayed(
+//     const Duration(seconds: 0),
+//     () {
+//       showDialog(
+//         context: context,
+//         builder: (context) {
+//           return UserDeletePopup();
+//         },
+//       );
+//     },
+//   );
+// }
