@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_api_project/color_constatnt.dart';
 import 'package:flutter_api_project/helper_function/my_text_style.dart';
 import 'package:flutter_api_project/helper_function/validators.dart';
+import 'package:flutter_api_project/models/user_model.dart';
 import 'package:flutter_api_project/providers/user_provider.dart';
 import 'package:flutter_api_project/widgets/my_text_form_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,6 +24,8 @@ class CreateUpdateUser extends StatefulWidget {
 class _CreateUpdateUserState extends State<CreateUpdateUser> {
   // keys
   final _key = GlobalKey<FormState>();
+  UserModel? userModel;
+  bool isUpdate = false;
   // controllers
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
@@ -37,6 +40,32 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
   final ageFocus = FocusNode();
   final urlFocus = FocusNode();
   final addressFocus = FocusNode();
+
+  //InitState
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        final myUser = ModalRoute.of(context)?.settings.arguments as UserModel?;
+
+        if (myUser != null) {
+          isUpdate = true;
+          userModel = myUser;
+          _setControllerValues(myUser);
+        }
+      },
+    );
+    super.initState();
+  }
+
+  void _setControllerValues(UserModel model) {
+    nameController.text = model.name;
+    phoneController.text = model.mobileNumber;
+    emailController.text = model.email;
+    ageController.text = '${model.age ?? ""}';
+    urlController.text = model.image ?? "";
+    addressController.text = model.address ?? "";
+  }
 
   @override
   void dispose() {
@@ -84,24 +113,47 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
           "address": addressController.text.trim(),
       };
 
-      // createUser
-      context.read<UserProvider>().createUser(json: json).then(
-        (value) async {
-          if (value.success) {
-            await context.read<UserProvider>().readUser();
-            Navigator.pop(context);
-          }
-        },
-      );
+      if (isUpdate) {
+        context
+            .read<UserProvider>()
+            .updateUser(
+              userID: userModel!.id,
+              json: json,
+            )
+            .then(
+          (value) async {
+            if (value.success) {
+              await context.read<UserProvider>().readUser();
+              Navigator.pop(context);
+            }
+          },
+        );
+      } else {
+        // createUser
+        context.read<UserProvider>().createUser(json: json).then(
+          (value) async {
+            if (value.success) {
+              await context.read<UserProvider>().readUser();
+              Navigator.pop(context);
+            }
+          },
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UserProvider>();
+
+    final loading = isUpdate
+        ? provider.isLoadingForUpdateUser
+        : provider.isLoadingForCreateUser;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add New User"),
+        title: Text(
+          isUpdate ? "Update User" : "Add New User",
+        ),
         automaticallyImplyLeading: false,
         leadingWidth: 55,
         leading: const LeadingBtn(),
@@ -113,7 +165,7 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
         onPressed: () => onSave(context),
         child: Padding(
           padding: const EdgeInsets.all(5.0),
-          child: provider.isLoadingForCreateUser
+          child: loading
               ? const SizedBox(
                   width: 15,
                   height: 15,
@@ -122,7 +174,7 @@ class _CreateUpdateUserState extends State<CreateUpdateUser> {
                   ),
                 )
               : Text(
-                  "Save",
+                  isUpdate ? "Update" : "Save",
                   style: MyTextStyle.medium.copyWith(
                     color: Colors.white,
                     fontSize: 15,

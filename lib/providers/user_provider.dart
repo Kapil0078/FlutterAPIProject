@@ -170,4 +170,55 @@ class UserProvider extends ChangeNotifier {
       return responseClass;
     }
   }
+
+  // UpdateUser
+  bool isLoadingForUpdateUser = false;
+  Future<ResponseClass> updateUser({
+    required int userID,
+    required Map<String, dynamic> json,
+  }) async {
+    final uri =
+        "${StringConstant.apiUrl}${StringConstant.updateUser(userID: userID)}";
+
+    ResponseClass responseClass = ResponseClass(
+      success: false,
+      message: StringConstant.initialErrorMsg,
+    );
+
+    try {
+      isLoadingForUpdateUser = true;
+      notifyListeners();
+      Response response = await dio.put(
+        uri,
+        data: json,
+      );
+
+      if (response.statusCode == 200) {
+        responseClass.success = true;
+        isLoadingForUpdateUser = false;
+        responseClass.message = response.data["msg"];
+        notifyListeners();
+        return responseClass;
+      } else {
+        responseClass.success = false;
+        isLoadingForUpdateUser = false;
+        responseClass.message = errorMessage(response.statusCode);
+        Fluttertoast.showToast(msg: responseClass.message);
+        notifyListeners();
+        return responseClass;
+      }
+    } on DioException catch (e) {
+      responseClass.success = false;
+      isLoadingForUpdateUser = false;
+      Fluttertoast.showToast(msg: responseClass.message);
+      notifyListeners();
+      return responseClass;
+    } catch (e) {
+      responseClass.success = false;
+      isLoadingForUpdateUser = false;
+      Fluttertoast.showToast(msg: responseClass.message);
+      notifyListeners();
+      return responseClass;
+    }
+  }
 }
