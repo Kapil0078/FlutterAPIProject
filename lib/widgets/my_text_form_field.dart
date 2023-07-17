@@ -16,7 +16,8 @@ class MyTextFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final void Function(String)? onFieldSubmitted;
   final TextInputAction? textInputAction;
-
+  final EdgeInsetsGeometry? contentPadding;
+final void Function(String)? onChanged;
   const MyTextFormField({
     Key? key,
     this.label,
@@ -28,8 +29,9 @@ class MyTextFormField extends StatelessWidget {
     this.keyboardType,
     this.hintText,
     this.focusNode,
-    this.onFieldSubmitted, 
+    this.onFieldSubmitted,
     this.textInputAction,
+    this.contentPadding, this.onChanged,
   }) : super(key: key);
 
   OutlineInputBorder border({Color color = appPrimary, double width = 1.0}) {
@@ -75,14 +77,16 @@ class MyTextFormField extends StatelessWidget {
               fontSize: 18,
               color: appPrimary,
             ),
+            onChanged: onChanged,
             inputFormatters: inputFormatters,
             textInputAction: textInputAction,
             decoration: InputDecoration(
               counterText: "",
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
+              contentPadding: contentPadding ??
+                  const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
               hintText: hintText,
               hintMaxLines: 1,
               hintStyle: MyTextStyle.regular.copyWith(
